@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -91,7 +89,7 @@ fun PermissionScreen(
 
 @Composable
 fun PermissionUI(navController: NavHostController) {
-    var selectedTab by remember { mutableStateOf(1) }
+    var selectedTab by remember { mutableStateOf(1) } // Default to Access History tab
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Top Bar
@@ -121,27 +119,25 @@ fun PermissionUI(navController: NavHostController) {
                     )
                 }
 
-                Box(modifier = Modifier.verticalScroll(rememberScrollState())){
-                    when (selectedTab) {
-                        0 -> NotificationTab(notificationList)
-                        1 -> AccessHistoryTab(accessHistoryList)
-                    }
-                }
                 // Content based on selected tab
-
+                when (selectedTab) {
+                    0 -> NotificationTab(notificationList)
+                    1 -> AccessHistoryTab(accessHistoryList)
+                }
             }
         }
 
+        // Bottom Navigation Bar
         BottomNavigationBarUI(navController)
     }
 }
 
 @Composable
 fun NotificationTab(notificationList: List<Notification>) {
+    // Removed verticalScroll here
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .verticalScroll(rememberScrollState())
     ) {
         notificationList.forEach { notification ->
             Card(
@@ -169,6 +165,7 @@ fun NotificationTab(notificationList: List<Notification>) {
 
 @Composable
 fun AccessHistoryTab(accessHistoryList: List<AccessHistory>) {
+    // Removed verticalScroll here
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -210,6 +207,7 @@ fun AccessHistoryTab(accessHistoryList: List<AccessHistory>) {
         }
     }
 }
+
 
 
 @Composable

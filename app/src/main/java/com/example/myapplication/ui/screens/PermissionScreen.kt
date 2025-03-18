@@ -52,11 +52,32 @@ val notificationList = listOf(
 )
 
 val accessHistoryList = listOf(
-    AccessHistory(name = "Dr. John Doe", action = "Access to your Vaccination Records", time = "04:32 PM", actionTypes = listOf("Read")),
-    AccessHistory(name = "Dr. Alex", action = "Requested access to your Vaccination Records", time = "04:35 PM", actionTypes = listOf("Write")),
-    AccessHistory(name = "Dr. Mike", action = "Updated your profile information", time = "05:00 PM", actionTypes = listOf("Update", "Write")),
-    AccessHistory(name = "Dr. Sarah", action = "Deleted your vaccination record", time = "06:15 PM", actionTypes = listOf("Delete", "Read"))
+    AccessHistory(
+        name = "Dr. John Doe",
+        action = "Requested access",
+        time = "04:32 PM",
+        actionTypes = listOf("Read")
+    ),
+    AccessHistory(
+        name = "Dr. Alex",
+        action = "Requested access",
+        time = "04:35 PM",
+        actionTypes = listOf("Write")
+    ),
+    AccessHistory(
+        name = "Dr. Mike",
+        action = "Requested access",
+        time = "05:00 PM",
+        actionTypes = listOf("Update", "Write")
+    ),
+    AccessHistory(
+        name = "Dr. Sarah",
+        action = "Requested access",
+        time = "06:15 PM",
+        actionTypes = listOf("Delete", "Read")
+    )
 )
+
 
 @Composable
 fun PermissionScreen(
@@ -162,17 +183,18 @@ fun AccessHistoryTab(accessHistoryList: List<AccessHistory>) {
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(text = history.name)
-                    Text(text = history.action)
-                    Text(text = history.time)
-
-                    // Display all actionTypes in one line, separated by commas
-                    val actionTypesText = history.actionTypes.joinToString(", ") // Join with comma
                     Text(
-                        text = actionTypesText, // Display action types as a single line
-                        color = Color.Blue,
-                        fontStyle = FontStyle.Italic,
+                        text = "${history.action} ",
+                        color = Color.Black // Default color for the action
+                    )
+                    // Style actionTypes (blue, italic)
+                    Text(
+                        text = "${history.actionTypes.joinToString(", ")}", // Display action types in one line
+                        color = Color.Blue, // Blue color
+                        fontStyle = FontStyle.Italic, // Italic style
                         modifier = Modifier.padding(top = 4.dp)
                     )
+                    Text(text = history.time)
 
                     Row(
                         horizontalArrangement = Arrangement.Center,
@@ -188,7 +210,6 @@ fun AccessHistoryTab(accessHistoryList: List<AccessHistory>) {
         }
     }
 }
-
 
 
 @Composable

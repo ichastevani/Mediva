@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -90,6 +91,10 @@ fun PermissionScreen(
 @Composable
 fun PermissionUI(navController: NavHostController) {
     var selectedTab by remember { mutableStateOf(1) } // Default to Access History tab
+    var showRejectDialog by remember { mutableStateOf(false) } // State for showing the reject dialog
+    var showApproveDialog by remember { mutableStateOf(false) } // State for showing the approve dialog
+    var showRevokeDialog by remember { mutableStateOf(false) } // State for showing the revoke dialog
+    var selectedName by remember { mutableStateOf("") } // Store the name to show in dialog
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Top Bar
@@ -121,8 +126,20 @@ fun PermissionUI(navController: NavHostController) {
 
                 // Content based on selected tab
                 when (selectedTab) {
-                    0 -> NotificationTab(notificationList)
-                    1 -> AccessHistoryTab(accessHistoryList)
+                    0 -> NotificationTab(notificationList, onRejectClicked = { name ->
+                        selectedName = name
+                        showRejectDialog = true
+                    }, onRevokeClicked = { name ->
+                        selectedName = name
+                        showRevokeDialog = true // Show the revoke confirmation dialog
+                    })
+                    1 -> AccessHistoryTab(accessHistoryList, onRejectClicked = { name ->
+                        selectedName = name
+                        showRejectDialog = true
+                    }, onApproveClicked = { name ->
+                        selectedName = name
+                        showApproveDialog = true
+                    })
                 }
             }
         }
@@ -130,11 +147,163 @@ fun PermissionUI(navController: NavHostController) {
         // Bottom Navigation Bar
         BottomNavigationBarUI(navController)
     }
+
+    // Show confirmation dialog for reject
+    if (showRejectDialog) {
+        RejectConfirmationDialog(
+            showDialog = showRejectDialog,
+            onDismiss = { showRejectDialog = false },
+            onConfirm = {
+                // Handle rejection logic here (e.g., revoke access)
+                println("Rejected access for $selectedName")
+                showRejectDialog = false // Close the dialog after confirmation
+            },
+            name = selectedName
+        )
+    }
+
+    // Show confirmation dialog for approve
+    if (showApproveDialog) {
+        ApproveConfirmationDialog(
+            showDialog = showApproveDialog,
+            onDismiss = { showApproveDialog = false },
+            onConfirm = {
+                // Handle approval logic here (e.g., approve access)
+                println("Approved access for $selectedName")
+                showApproveDialog = false // Close the dialog after confirmation
+            },
+            name = selectedName
+        )
+    }
+
+    // Show confirmation dialog for revoke
+    if (showRevokeDialog) {
+        RevokeConfirmationDialog(
+            showDialog = showRevokeDialog,
+            onDismiss = { showRevokeDialog = false },
+            onConfirm = {
+                // Handle revoking access logic here
+                println("Revoked access for $selectedName")
+                showRevokeDialog = false // Close the dialog after confirmation
+            },
+            name = selectedName
+        )
+    }
 }
 
 @Composable
-fun NotificationTab(notificationList: List<Notification>) {
-    // Removed verticalScroll here
+fun RevokeConfirmationDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    name: String
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = {
+                Text("Are you sure you want to revoke?")
+            },
+            text = {
+                Text("Are you sure you want to revoke access for $name? This action cannot be undone.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onConfirm() // Confirm revoke
+                        onDismiss() // Dismiss the dialog
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onDismiss // Dismiss the dialog without doing anything
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun ApproveConfirmationDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    name: String
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = {
+                Text("Are you sure you want to approve?")
+            },
+            text = {
+                Text("Are you sure you want to approve access for $name?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onConfirm() // Confirm approval
+                        onDismiss() // Dismiss the dialog
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onDismiss // Dismiss the dialog without doing anything
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun RejectConfirmationDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    name: String
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = {
+                Text("Are you sure you want to reject?")
+            },
+            text = {
+                Text("Are you sure you want to reject access for $name? This action cannot be undone.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onConfirm() // Confirm rejection
+                        onDismiss() // Dismiss the dialog
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onDismiss // Dismiss the dialog without doing anything
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun NotificationTab(notificationList: List<Notification>, onRejectClicked: (String) -> Unit, onRevokeClicked: (String) -> Unit) {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -152,7 +321,7 @@ fun NotificationTab(notificationList: List<Notification>) {
                     Text(text = notification.action)
                     Text(text = notification.time)
                     Button(
-                        onClick = { /* Handle Revoke Access action */ },
+                        onClick = { onRevokeClicked(notification.name) }, // Trigger revoke dialog
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
                         Text("Revoke Access")
@@ -164,8 +333,7 @@ fun NotificationTab(notificationList: List<Notification>) {
 }
 
 @Composable
-fun AccessHistoryTab(accessHistoryList: List<AccessHistory>) {
-    // Removed verticalScroll here
+fun AccessHistoryTab(accessHistoryList: List<AccessHistory>, onRejectClicked: (String) -> Unit, onApproveClicked: (String) -> Unit) {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -199,8 +367,8 @@ fun AccessHistoryTab(accessHistoryList: List<AccessHistory>) {
                             .padding(top = 8.dp)
                             .fillMaxWidth()
                     ) {
-                        ApproveButton()
-                        RejectButton()
+                        ApproveButton(onApproveClicked = { onApproveClicked(history.name) })
+                        RejectButton(onRejectClicked = { onRejectClicked(history.name) })
                     }
                 }
             }
@@ -208,12 +376,10 @@ fun AccessHistoryTab(accessHistoryList: List<AccessHistory>) {
     }
 }
 
-
-
 @Composable
-fun RejectButton() {
+fun RejectButton(onRejectClicked: (String) -> Unit) {
     Button(
-        onClick = { /* Handle Reject action */ },
+        onClick = { onRejectClicked("Dr. John Doe") }, // Replace with the actual name of the person to be rejected
         modifier = Modifier
             .padding(8.dp),
         shape = RoundedCornerShape(50), // Rounded corners
@@ -226,11 +392,10 @@ fun RejectButton() {
     }
 }
 
-
 @Composable
-fun ApproveButton() {
+fun ApproveButton(onApproveClicked: (String) -> Unit) {
     Button(
-        onClick = { /* Handle Approve action */ },
+        onClick = { onApproveClicked("Dr. John Doe") }, // Replace with the actual name of the person to be approved
         modifier = Modifier
             .padding(8.dp),
         shape = RoundedCornerShape(50), // Rounded corners

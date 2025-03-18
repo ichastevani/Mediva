@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,11 +8,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
@@ -96,7 +100,7 @@ fun PermissionUI(navController: NavHostController) {
     var showRevokeDialog by remember { mutableStateOf(false) } // State for showing the revoke dialog
     var selectedName by remember { mutableStateOf("") } // Store the name to show in dialog
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
         // Top Bar
         TopAppBarUI()
 
@@ -104,24 +108,35 @@ fun PermissionUI(navController: NavHostController) {
             modifier = Modifier
                 .weight(1f) // Mendorong konten agar BottomNavigation menempel di bawah
                 .fillMaxWidth()
+                .background(Color.White)
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.fillMaxWidth().background(Color.White)) {
 
                 // Tab Row for Notification and Access History
-                ScrollableTabRow(
-                    selectedTabIndex = selectedTab,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Tab(
-                        selected = selectedTab == 0,
-                        onClick = { selectedTab = 0 },
-                        text = { Text("Notification") }
-                    )
-                    Tab(
-                        selected = selectedTab == 1,
-                        onClick = { selectedTab = 1 },
-                        text = { Text("Access History") }
-                    )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White) // Set the background color to white
+                )
+                {
+                    ScrollableTabRow(
+                        selectedTabIndex = selectedTab,
+                        modifier = Modifier.fillMaxWidth().background(Color.White)
+                    ) {
+                        Tab(
+                            modifier = Modifier.fillMaxWidth().background(Color.White),
+                            selected = selectedTab == 0,
+                            onClick = { selectedTab = 0 },
+                            text = { Text("Notification") }
+                        )
+                        Tab(
+                            modifier = Modifier.fillMaxWidth().background(Color.White),
+                            selected = selectedTab == 1,
+                            onClick = { selectedTab = 1 },
+                            text = { Text("Access History") }
+                        )
+                    }
                 }
 
                 // Content based on selected tab
@@ -212,14 +227,23 @@ fun RevokeConfirmationDialog(
                     onClick = {
                         onConfirm() // Confirm revoke
                         onDismiss() // Dismiss the dialog
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF0069C0), // Blue background for Yes button
+                        contentColor = Color.White // White text for Yes button
+                    ),
+                    shape = RoundedCornerShape(50) // Rounded corners for the button
                 ) {
                     Text("Yes")
                 }
             },
             dismissButton = {
                 Button(
-                    onClick = onDismiss // Dismiss the dialog without doing anything
+                    onClick = onDismiss, // Dismiss the dialog without doing anything
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red, // Red background for No button
+                        contentColor = Color.White
+                    ),
                 ) {
                     Text("No")
                 }
@@ -249,14 +273,24 @@ fun ApproveConfirmationDialog(
                     onClick = {
                         onConfirm() // Confirm approval
                         onDismiss() // Dismiss the dialog
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF0069C0), // Blue background for Yes button
+                        contentColor = Color.White // White text for Yes button
+                    ),
+                    shape = RoundedCornerShape(50) // Rounded corners for the button
                 ) {
                     Text("Yes")
                 }
             },
             dismissButton = {
                 Button(
-                    onClick = onDismiss // Dismiss the dialog without doing anything
+                    onClick = onDismiss, // Dismiss the dialog without doing anything
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red, // Red background for No button
+                        contentColor = Color.White // White text for No button
+                    ),
+                    shape = RoundedCornerShape(50) // Rounded corners for the button
                 ) {
                     Text("No")
                 }
@@ -286,14 +320,24 @@ fun RejectConfirmationDialog(
                     onClick = {
                         onConfirm() // Confirm rejection
                         onDismiss() // Dismiss the dialog
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF0069C0), // Blue background for Yes button
+                        contentColor = Color.White // White text for Yes button
+                    ),
+                    shape = RoundedCornerShape(50) // Rounded corners for the button
                 ) {
                     Text("Yes")
                 }
             },
             dismissButton = {
                 Button(
-                    onClick = onDismiss // Dismiss the dialog without doing anything
+                    onClick = onDismiss, // Dismiss the dialog without doing anything
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red, // Red background for No button
+                        contentColor = Color.White // White text for No button
+                    ),
+                    shape = RoundedCornerShape(50) // Rounded corners for the button
                 ) {
                     Text("No")
                 }
@@ -312,7 +356,8 @@ fun NotificationTab(notificationList: List<Notification>, onRejectClicked: (Stri
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE1E2EC))
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -322,7 +367,12 @@ fun NotificationTab(notificationList: List<Notification>, onRejectClicked: (Stri
                     Text(text = notification.time)
                     Button(
                         onClick = { onRevokeClicked(notification.name) }, // Trigger revoke dialog
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp),
+                        shape = RoundedCornerShape(50), // Rounded corners
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Red, // Blue background for Approve
+                            contentColor = Color.White // White text for both buttons
+                        )
                     ) {
                         Text("Revoke Access")
                     }
@@ -337,12 +387,14 @@ fun AccessHistoryTab(accessHistoryList: List<AccessHistory>, onRejectClicked: (S
     Column(
         modifier = Modifier
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         accessHistoryList.forEach { history ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE1E2EC))
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)

@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -64,10 +66,11 @@ fun ActivityUI(navController: NavHostController) {
             modifier = Modifier
                 .weight(1f) // Mendorong konten agar BottomNavigation menempel di bawah
                 .fillMaxWidth()
+                .background(Color.White)
                 .verticalScroll(rememberScrollState()),
         ) {
             Column(
-                modifier = Modifier.padding(0.dp)
+                modifier = Modifier.padding(0.dp) .background(Color.White)
             ) {
                 // Calling the ActivityTable composable here
                 ActivityTable(activityList = activityList)

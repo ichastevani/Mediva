@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SnackbarHostState
@@ -21,6 +23,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -37,8 +41,9 @@ data class Notification(
 
 data class AccessHistory(
     val name: String,
-    val action: String,
-    val time: String
+    val action: String,   // Action description (e.g., "Access", "Requested", etc.)
+    val time: String,     // Time of action
+    val actionTypes: List<String> // List of action types (e.g., ["Read", "Write"])
 )
 
 val notificationList = listOf(
@@ -47,10 +52,11 @@ val notificationList = listOf(
 )
 
 val accessHistoryList = listOf(
-    AccessHistory(name = "Dr. John Doe", action = "Requested access to your Vaccination Records", time = "04:32 PM"),
-    AccessHistory(name = "Dr. Alex", action = "Requested access to your Vaccination Records", time = "04:32 PM")
+    AccessHistory(name = "Dr. John Doe", action = "Access to your Vaccination Records", time = "04:32 PM", actionTypes = listOf("Read")),
+    AccessHistory(name = "Dr. Alex", action = "Requested access to your Vaccination Records", time = "04:35 PM", actionTypes = listOf("Write")),
+    AccessHistory(name = "Dr. Mike", action = "Updated your profile information", time = "05:00 PM", actionTypes = listOf("Update", "Write")),
+    AccessHistory(name = "Dr. Sarah", action = "Deleted your vaccination record", time = "06:15 PM", actionTypes = listOf("Delete", "Read"))
 )
-
 
 @Composable
 fun PermissionScreen(
@@ -73,8 +79,7 @@ fun PermissionUI(navController: NavHostController) {
         Box(
             modifier = Modifier
                 .weight(1f) // Mendorong konten agar BottomNavigation menempel di bawah
-                .fillMaxWidth(),
-//            contentAlignment = Alignment.Center
+                .fillMaxWidth()
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -95,11 +100,14 @@ fun PermissionUI(navController: NavHostController) {
                     )
                 }
 
-                // Content based on selected tab
-                when (selectedTab) {
-                    0 -> NotificationTab(notificationList)
-                    1 -> AccessHistoryTab(accessHistoryList)
+                Box(modifier = Modifier.verticalScroll(rememberScrollState())){
+                    when (selectedTab) {
+                        0 -> NotificationTab(notificationList)
+                        1 -> AccessHistoryTab(accessHistoryList)
+                    }
                 }
+                // Content based on selected tab
+
             }
         }
 
@@ -143,7 +151,6 @@ fun AccessHistoryTab(accessHistoryList: List<AccessHistory>) {
     Column(
         modifier = Modifier
             .padding(16.dp)
-//            .verticalScroll(rememberScrollState())
     ) {
         accessHistoryList.forEach { history ->
             Card(
@@ -157,34 +164,67 @@ fun AccessHistoryTab(accessHistoryList: List<AccessHistory>) {
                     Text(text = history.name)
                     Text(text = history.action)
                     Text(text = history.time)
+
+                    // Display all actionTypes in one line, separated by commas
+                    val actionTypesText = history.actionTypes.joinToString(", ") // Join with comma
+                    Text(
+                        text = actionTypesText, // Display action types as a single line
+                        color = Color.Blue,
+                        fontStyle = FontStyle.Italic,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier.padding(top = 8.dp)
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .fillMaxWidth()
                     ) {
-                        Button(
-                            modifier = Modifier.weight(1f),
-                            onClick = { /* Handle Approve View action */ }
-                        ) {
-                            Text("Approve View")
-                        }
-                        Button(
-                            modifier = Modifier.weight(1f),
-                            onClick = { /* Handle Approve Edit action */ }
-                        ) {
-                            Text("Approve Edit")
-                        }
-                        Button(
-                            modifier = Modifier.weight(1f),
-                            onClick = { /* Handle Reject action */ }
-                        ) {
-                            Text("Reject")
-                        }
+                        ApproveButton()
+                        RejectButton()
                     }
                 }
             }
         }
     }
 }
+
+
+
+@Composable
+fun RejectButton() {
+    Button(
+        onClick = { /* Handle Reject action */ },
+        modifier = Modifier
+            .padding(8.dp),
+        shape = RoundedCornerShape(50), // Rounded corners
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Red, // Always red for Reject button
+            contentColor = Color.White // White text for both buttons
+        )
+    ) {
+        Text("Reject")
+    }
+}
+
+
+@Composable
+fun ApproveButton() {
+    Button(
+        onClick = { /* Handle Approve action */ },
+        modifier = Modifier
+            .padding(8.dp),
+        shape = RoundedCornerShape(50), // Rounded corners
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF0069C0), // Blue background for Approve
+            contentColor = Color.White // White text for both buttons
+        )
+    ) {
+        Text("Approve")
+    }
+}
+
+
 
 @Preview(showBackground = true)
 @Composable
